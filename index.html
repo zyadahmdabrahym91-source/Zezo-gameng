@@ -1,39 +1,94 @@
-
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Zezo Football Challenge</title>
+<title>تحدي زيزو - 30</title>
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#00ff88">
+<meta name="theme-color" content="#0f172a">
 <style>
-body{margin:0;background:#0a0a0a;color:white;font-family:Arial;text-align:center}
-canvas{background:linear-gradient(#1a5e1a,#0f3d0f);display:block;margin:20px auto;border:3px solid #00ff88;border-radius:10px}
-h1{color:#00ff88}
-button{background:#00ff88;color:#000;border:none;padding:15px 30px;font-size:18px;border-radius:10px;font-weight:bold;margin:10px}
-#score{font-size:24px}
+*{box-sizing:border-box;font-family:'Segoe UI',Tahoma}
+body{margin:0;background:#0f172a;color:white;min-height:100vh}
+.header{background:linear-gradient(90deg,#7c3aed,#ec4899);padding:20px;text-align:center}
+.header h1{margin:0;font-size:28px}
+.card{background:#1e293b;margin:15px;border-radius:16px;padding:20px;border:1px solid #334155}
+button{width:100%;padding:14px;border:none;border-radius:12px;font-size:18px;font-weight:bold;cursor:pointer;margin:6px 0}
+.btn-main{background:linear-gradient(90deg,#7c3aed,#ec4899);color:white}
+.btn-sec{background:#334155;color:white}
+.timer{font-size:64px;font-weight:900;text-align:center;color:#facc15;margin:10px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.q{font-size:22px;text-align:center;line-height:1.6;min-height:80px;display:flex;align-items:center;justify-content:center}
+.score{display:flex;justify-content:space-around;font-size:20px;margin:10px 0}
+.hidden{display:none}
+input{width:100%;padding:12px;border-radius:10px;border:1px solid #475569;background:#0f172a;color:white;font-size:16px;margin:8px 0}
 </style>
 </head>
 <body>
-<h1>⚽ تحدي زيزو ⚽</h1>
-<div id="score">النقاط: <span id="points">0</span></div>
-<canvas id="game" width="350" height="500"></canvas>
-<br><button onclick="shoot()">شوت! 🥅</button>
+<div class="header">
+<h1>⚡ تحدي زيزو - 30 ⚡</h1>
+<p>نسختك الخاصة من تحدي الثلاثين</p>
+</div>
+
+<!-- شاشة البداية -->
+<div id="home" class="card">
+<h2>اختر الفئة</h2>
+<div class="grid">
+<button class="btn-sec" onclick="startGame('كورة')">⚽ كورة</button>
+<button class="btn-sec" onclick="startGame('أفلام')">🎬 أفلام</button>
+<button class="btn-sec" onclick="startGame('أنمي')">🎌 أنمي</button>
+<button class="btn-sec" onclick="startGame('منوعات')">🧠 منوعات</button>
+</div>
+<div style="margin-top:15px">
+<input id="team1" placeholder="اسم الفريق الأول">
+<input id="team2" placeholder="اسم الفريق الثاني">
+</div>
+<button class="btn-main" onclick="startGame('كورة')">ابدأ التحدي 🚀</button>
+<p style="text-align:center;opacity:0.6;font-size:12px;margin-top:15px">فكرة مستوحاة من تحدي الثلاثين - نسخة زيزو الخاصة</p>
+</div>
+
+<!-- شاشة اللعب -->
+<div id="game" class="card hidden">
+<div class="score"><div>🔵 <span id="s1">0</span> - <span id="n1">فريق 1</span></div><div>🔴 <span id="s2">0</span> - <span id="n2">فريق 2</span></div></div>
+<div style="text-align:center;opacity:0.8" id="cat">كورة</div>
+<div class="timer" id="timer">30</div>
+<div class="q" id="question">...</div>
+<div class="grid">
+<button class="btn-main" style="background:#22c55e" onclick="addPoint(1)">نقطة للأول +1</button>
+<button class="btn-main" style="background:#ef4444" onclick="addPoint(2)">نقطة للتاني +1</button>
+</div>
+<button class="btn-sec" onclick="nextQ()">سؤال تاني ⏭️</button>
+<button class="btn-sec" onclick="resetTimer()">إعادة الوقت 🔄</button>
+<button class="btn-sec" onclick="goHome()">رجوع للرئيسية</button>
+</div>
+
 <script>
-const c=document.getElementById('game'),ctx=c.getContext('2d');
-let points=0, ball={x:175,y:400,dy:0,shooting:false};
-let goal={x:125,y:30,w:100,h:20};
-function draw(){
-ctx.clearRect(0,0,350,500);
-ctx.fillStyle='white';ctx.fillRect(goal.x,goal.y,goal.w,goal.h);
-ctx.strokeStyle='white';ctx.lineWidth=2;ctx.strokeRect(goal.x,goal.y-40,goal.w,60);
-ctx.beginPath();ctx.arc(ball.x,ball.y,15,0,Math.PI*2);ctx.fillStyle='white';ctx.fill();ctx.strokeStyle='black';ctx.stroke();
-if(ball.shooting){ball.y+=ball.dy;if(ball.y<60){if(ball.x>goal.x&&ball.x<goal.x+goal.w){points++;document.getElementById('points').innerText=points;}ball.shooting=false;ball.y=400;}}
-requestAnimationFrame(draw);
+const data={
+"كورة":["اذكر 5 أندية فازت بدوري أبطال أوروبا","اذكر 5 لاعبين لعبوا لبرشلونة وريال مدريد","اذكر 5 حراس مرمى مصريين","اذكر 5 منتخبات فازت بكأس العالم","اذكر 5 لاعبين سجلوا +30 هدف في موسم واحد","اذكر 5 مدربين دربوا منتخب مصر","اذكر 5 أندية سعودية","اذكر 5 لاعبين أفارقة فازوا بالكرة الذهبية الأفريقية"],
+"أفلام":["اذكر 5 أفلام لمحمد هنيدي","اذكر 5 أفلام مارفل","اذكر 5 أفلام فيها زومبي","اذكر 5 أفلام كرتون ديزني","اذكر 5 أفلام مصرية كوميدية 2020+","اذكر 5 أفلام فيها توم هانكس"],
+"أنمي":["اذكر 5 شخصيات من ناروتو","اذكر 5 أنميات رياضية","اذكر 5 شخصيات من ون بيس","اذكر 5 أنميات فيها شياطين","اذكر 5 مؤديين أصوات مشهورين"],
+"منوعات":["اذكر 5 عواصم عربية","اذكر 5 أنواع فواكه حمراء","اذكر 5 برامج موبايل مشهورة","اذكر 5 أكلات مصرية","اذكر 5 سيارات يابانية"]
+};
+let cat='كورة',time=30,interval=null,score1=0,score2=0;
+
+function startGame(c){
+cat=c||document.getElementById('cat').innerText;
+document.getElementById('cat').innerText=cat;
+document.getElementById('n1').innerText=document.getElementById('team1').value||'فريق 1';
+document.getElementById('n2').innerText=document.getElementById('team2').value||'فريق 2';
+document.getElementById('home').classList.add('hidden');
+document.getElementById('game').classList.remove('hidden');
+nextQ();
 }
-function shoot(){if(!ball.shooting){ball.shooting=true;ball.dy=-10;ball.x=125+Math.random()*100;}}
-draw();
+function nextQ(){
+const arr=data[cat];document.getElementById('question').innerText=arr[Math.floor(Math.random()*arr.length)];
+resetTimer();
+}
+function resetTimer(){
+clearInterval(interval);time=30;document.getElementById('timer').innerText=time;
+interval=setInterval(()=>{time--;document.getElementById('timer').innerText=time;if(time<=0){clearInterval(interval);document.getElementById('timer').innerText='انتهى!';navigator.vibrate&&navigator.vibrate(500);}},1000);
+}
+function addPoint(t){if(t==1)score1++;else score2++;document.getElementById('s1').innerText=score1;document.getElementById('s2').innerText=score2;}
+function goHome(){clearInterval(interval);document.getElementById('game').classList.add('hidden');document.getElementById('home').classList.remove('hidden');}
 </script>
 </body>
 </html>
