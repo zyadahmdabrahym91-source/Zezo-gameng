@@ -1,0 +1,16 @@
+{
+  "name": "Zezo Football Challenge",
+  "short_name": "Zezo Game",
+  "description": "تحدي الكورة مع زيزو",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#00ff88",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/33/33736.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
