@@ -1,1 +1,39 @@
 
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zezo Football Challenge</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#00ff88">
+<style>
+body{margin:0;background:#0a0a0a;color:white;font-family:Arial;text-align:center}
+canvas{background:linear-gradient(#1a5e1a,#0f3d0f);display:block;margin:20px auto;border:3px solid #00ff88;border-radius:10px}
+h1{color:#00ff88}
+button{background:#00ff88;color:#000;border:none;padding:15px 30px;font-size:18px;border-radius:10px;font-weight:bold;margin:10px}
+#score{font-size:24px}
+</style>
+</head>
+<body>
+<h1>⚽ تحدي زيزو ⚽</h1>
+<div id="score">النقاط: <span id="points">0</span></div>
+<canvas id="game" width="350" height="500"></canvas>
+<br><button onclick="shoot()">شوت! 🥅</button>
+<script>
+const c=document.getElementById('game'),ctx=c.getContext('2d');
+let points=0, ball={x:175,y:400,dy:0,shooting:false};
+let goal={x:125,y:30,w:100,h:20};
+function draw(){
+ctx.clearRect(0,0,350,500);
+ctx.fillStyle='white';ctx.fillRect(goal.x,goal.y,goal.w,goal.h);
+ctx.strokeStyle='white';ctx.lineWidth=2;ctx.strokeRect(goal.x,goal.y-40,goal.w,60);
+ctx.beginPath();ctx.arc(ball.x,ball.y,15,0,Math.PI*2);ctx.fillStyle='white';ctx.fill();ctx.strokeStyle='black';ctx.stroke();
+if(ball.shooting){ball.y+=ball.dy;if(ball.y<60){if(ball.x>goal.x&&ball.x<goal.x+goal.w){points++;document.getElementById('points').innerText=points;}ball.shooting=false;ball.y=400;}}
+requestAnimationFrame(draw);
+}
+function shoot(){if(!ball.shooting){ball.shooting=true;ball.dy=-10;ball.x=125+Math.random()*100;}}
+draw();
+</script>
+</body>
+</html>
